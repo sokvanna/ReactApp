@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>SamePage</title>
+	<meta charset="UTF-8">
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="/styles.css" media="all" type="text/css" rel="stylesheet">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+</head>
+
+<body>
+<div id="header">
+
+</div>
+
+<div id="main">
+
+</div>
+
+<div id="footer">
+
+</div>
+<script>
+$.ajax({
+    url: 'https://en.wikipedia.org/w/api.php?action=query&list=random&format=json&rnnamespace=108&rnlimit=10',
+    data: {
+        format: 'json'
+    },
+    dataType: 'jsonp'
+}).done( function ( data ) {
+  for(var i = 0; i < data.query.random.length; i++){
+   console.log(data.query.random[i]);
+   var title = data.query.random[i].title.replace('Book:', '');
+   $('#main').append('<span class="bookTitle">'+title+'</span>');
+   $('#main').append('<span class="bookID">'+data.query.random[i].id+'</span>');
+ 
+  
+}
+
+} );
+
+$('.bookTitle').live('click', function(){
+var getTitle =  $(this).text();
+var theID = $(this).next().text();
+console.log(getTitle);
+var infoUrl = 'https://en.wikipedia.org/w/api.php?action=query&prop=categories|pageimages|pageterms&format=json&rawcontinue=&titles=Book:' + getTitle;
+var imageUrl = 'https://en.wikipedia.org//w/api.php?action=query&titles=' +getTitle+ '&prop=pageimages';
+// get category and description if available
+$.ajax({
+    url: infoUrl,
+    data: {
+        format: 'json'
+    },
+    dataType: 'jsonp'
+}).done( function ( data ) {
+	
+console.log(data.query.pages[theID].categories[0].title);
+console.log(data.query.pages[theID]);
+
+} );
+
+// get image url
+$.ajax({
+    url: imageUrl,
+    data: {
+        format: 'json'
+    },
+    dataType: 'jsonp'
+}).done( function ( data ) {
+	var firsty;
+	
+for (first in data.query.pages) {
+firsty = first;
+}
+console.log(data.query.pages[firsty].thumbnail.source);
+
+} );
+ 
+
+});
+
+</script>
+</body>
+
+
+</html>
