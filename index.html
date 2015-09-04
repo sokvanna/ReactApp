@@ -68,7 +68,11 @@ $.ajax({
 for (first in data.query.pages) {
 firsty = first;
 }
-console.log(data.query.pages[firsty].categories[0].title);
+for (allCats in data.query.pages[firsty].categories) {
+checkCats = allCats;
+console.log(data.query.pages[firsty].categories[checkCats].title);
+}
+
 
 
 } );
