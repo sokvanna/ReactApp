@@ -6,7 +6,7 @@
 	<meta charset="UTF-8">
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link href="/styles.css" media="all" type="text/css" rel="stylesheet">
+	<link href="styles.css" media="all" type="text/css" rel="stylesheet">
   <script src="https://fb.me/react-0.13.3.min.js"></script>
   <script src="https://fb.me/JSXTransformer-0.13.3.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
@@ -40,10 +40,6 @@
    var ID = data.query.random[i].id;
 
    BookTitle.push(title );
-    
-  
-
- console.log(ID);
   
 }
 
@@ -52,56 +48,9 @@
 setTimeout(function(){
 
 
-
-
-var BookComponent = React.createClass({
- 
-componentDidMount: function(){
-   
-
-
-
-
-},
-  render: function(){
-
-
-return (
-
-
-  <div>{BookTitle}</div>
-
-);
-  
-}
-});
-
-
-var BookComponent = React.createClass({
- 
-
-  render: function(){
-
-
-return (
-
-
-  <div className="bookContainer">{BookTitle}</div>
-
-);
-  
-}
-});
-
-
-React.render(<BookComponent />, document.getElementById('footer'));
-$('.bookContainer span').addClass('bookTitle');
-
-}, 3000);
-
-$('.bookTitle').live('click', function(){
-var getTitle =  $(this).text();
-var theID = $(this).next().text();
+var Library = React.createClass({
+  handleClick: function(i) {
+    var getTitle =  this.props.items[i];
 console.log(getTitle);
 var infoUrl = 'https://en.wikipedia.org/w/api.php?action=query&prop=categories|pageimages|pageterms&format=json&rawcontinue=&titles=Book:' + getTitle;
 var imageUrl = 'https://en.wikipedia.org//w/api.php?action=query&titles=' +getTitle+ '&prop=pageimages';
@@ -121,9 +70,6 @@ firsty = first;
 }
 console.log(data.query.pages[firsty].categories[0].title);
 
-console.log(data.query.pages);	
-
-
 
 } );
 
@@ -135,17 +81,37 @@ $.ajax({
     },
     dataType: 'jsonp'
 }).done( function ( data ) {
-	var firsty;
-	
+  var firsty;
+  
 for (first in data.query.pages) {
 firsty = first;
 }
 console.log(data.query.pages[firsty].thumbnail.source);
 
 } );
- 
+  
+  },
 
+  render: function() {
+    return (
+      <div>
+        {this.props.items.map(function(item, i) {
+          return (
+            <div className="bookTitle" onClick={this.handleClick.bind(this, i)} key={i}>{item}</div>
+          );
+        }, this)}
+      </div>
+    );
+  }
 });
+
+React.render(
+  <Library items={BookTitle} />, document.getElementById('main')
+);
+
+}, 3000);
+
+
 
 
 </script>
