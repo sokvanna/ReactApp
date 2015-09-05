@@ -7,7 +7,7 @@ margin: 0 auto;
 text-align: center;
 
 }
-.bookTitle{
+.books{
 	display: block;
 	cursor: pointer;
 	padding:10px;
@@ -17,8 +17,8 @@ text-align: center;
 	background-color: #333;
 	border:2px solid #000;
 }
-.bookTitle:hover{
+.books:hover{
 background-color: #eee;
 color:#000;
 }
-.bookInfo{display: none;}
+.bookInfo{display: none; padding:20px; text-align: left;}

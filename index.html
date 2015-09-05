@@ -20,6 +20,9 @@
 <div id="main">
 
 </div>
+<div id="bookMarks">
+
+  </div>
 
 <div id="footer">
 
@@ -79,7 +82,8 @@ var imageUrl = 'https://en.wikipedia.org//w/api.php?action=query&titles=' +getTi
  var splitClass = setThis.attr('class').split(' ');
  var alreadyDid = splitClass[1];
 if(typeof alreadyDid == 'undefined'){
-setThis.append('<div class="bookInfo"></div>');
+setThis.append('<div class="bookInfo"><div class="imageContainer"></div><div class="categoryContainer"><h3>Categories:</h3></div></div>');
+setThis.find('.categoryContainer').after('<input class="marker" type="button" value="Bookmark This">');
 
 // get image url
 $.ajax({
@@ -95,7 +99,7 @@ for (first in data.query.pages) {
 firsty = first;
 }
 
-setThis.find('.bookInfo').append('<img src="'+data.query.pages[firsty].thumbnail.source+'"/>');
+setThis.find('.imageContainer').append('<img src="'+data.query.pages[firsty].thumbnail.source+'"/>');
 setThis.addClass('appendSet');
 
 
@@ -121,7 +125,7 @@ checkCats = allCats;
 console.log(data.query.pages[firsty].categories[checkCats].title);
 catTitle = data.query.pages[firsty].categories[checkCats].title.replace('Category:', '');
 
-setThis.find('.bookInfo').append('<p>'+catTitle+'</p>');
+setThis.find('.categoryContainer').append('<p>'+catTitle+'</p>');
 setThis.addClass('appendSet');
 
 }
@@ -131,10 +135,11 @@ setThis.addClass('appendSet');
 
 
 } );
+
 }
-setTimeout(function(){
-setThis.find('.bookInfo').slideToggle();
-  }, 300);
+
+setThis.find('.bookInfo').slideToggle('slow');
+  
   },
 
   render: function() {
@@ -142,7 +147,7 @@ setThis.find('.bookInfo').slideToggle();
       <div>
         {this.props.items.map(function(item, i) {
           return (
-            <div className="bookTitle" onClick={this.handleClick.bind(this, i)} key={i}>{item}</div>
+            <div className="books" onClick={this.handleClick.bind(this, i)} key={i}><h2>{item}</h2></div>
           );
         }, this)}
       </div>
@@ -156,6 +161,27 @@ React.render(
 
 }
 
+$('.marker').live('click', function(){
+var getVal = $(this).val();
+var thisTitle =$(this).parent().parent().find('h2').text();
+if(getVal == 'Bookmark This'){
+$(this).val('Remove Bookmark');
+localStorage[thisTitle] = thisTitle;
+$('#bookMarks').append('<p>'+ thisTitle + '<input class="bookRemove" type="button" value="Remove">' + '</p>');
+}
+else{
+  $(this).val('Bookmark This');
+localStorage.removeItem(thisTitle);
+}
+
+});
+
+$('.bookRemove').live('click', function(){
+var listTitle = $(this).parent().text();
+$('.books h2:contains("'+listTitle+'")').parent().find('.marker').val('Bookmark This');
+console.log($('.books h2:contains("'+listTitle+'")').parent().find('.marker').val());
+$(this).parent().remove();
+});
 
 });
 
