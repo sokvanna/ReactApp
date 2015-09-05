@@ -66,33 +66,19 @@ function startReact(BookTitle){
 
 var Library = React.createClass({
   handleClick: function(i) {
+    
+    
+
     var getTitle =  this.props.items[i];
 console.log(getTitle);
 var infoUrl = 'https://en.wikipedia.org/w/api.php?action=query&prop=categories|pageimages|pageterms&format=json&rawcontinue=&titles=Book:' + getTitle;
 var imageUrl = 'https://en.wikipedia.org//w/api.php?action=query&titles=' +getTitle+ '&prop=pageimages';
 // get category and description if available
-$.ajax({
-    url: infoUrl,
-    data: {
-        format: 'json'
-    },
-    dataType: 'jsonp'
-}).done( function ( data ) {
-
-    var firsty;
-  
-for (first in data.query.pages) {
-firsty = first;
-}
-for (allCats in data.query.pages[firsty].categories) {
-checkCats = allCats;
-console.log(data.query.pages[firsty].categories[checkCats].title);
-}
-
-
-
-} );
-
+ var setThis = $(this.getDOMNode()).find('div:contains(' + getTitle + ')');
+    console.log(setThis);
+ var splitClass = setThis.attr('class').split(' ');
+ var alreadyDid = splitClass[1];
+ setThis.append('<div class="bookInfo"></div>');
 // get image url
 $.ajax({
     url: imageUrl,
@@ -106,9 +92,47 @@ $.ajax({
 for (first in data.query.pages) {
 firsty = first;
 }
+if(typeof alreadyDid == 'undefined'){
+setThis.find('.bookInfo').append('<img src="'+data.query.pages[firsty].thumbnail.source+'"/>');
+setThis.addClass('appendSet');
+} 
+
 console.log(data.query.pages[firsty].thumbnail.source);
 
 } );
+
+$.ajax({
+    url: infoUrl,
+    data: {
+        format: 'json'
+    },
+    dataType: 'jsonp'
+}).done( function (data) {
+
+    var firsty;
+  
+for (first in data.query.pages) {
+firsty = first;
+}
+for (allCats in data.query.pages[firsty].categories) {
+checkCats = allCats;
+console.log(data.query.pages[firsty].categories[checkCats].title);
+if(typeof alreadyDid == 'undefined'){
+  console.log(setThis.parent());
+setThis.find('.bookInfo').append('<p>"'+data.query.pages[firsty].categories[checkCats].title+'"</p>');
+setThis.addClass('appendSet');
+
+}
+
+}
+
+setThis.find('.bookInfo').slideToggle();
+
+
+
+} );
+
+
   
   },
 
