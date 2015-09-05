@@ -78,7 +78,9 @@ var imageUrl = 'https://en.wikipedia.org//w/api.php?action=query&titles=' +getTi
     console.log(setThis);
  var splitClass = setThis.attr('class').split(' ');
  var alreadyDid = splitClass[1];
- setThis.append('<div class="bookInfo"></div>');
+if(typeof alreadyDid == 'undefined'){
+setThis.append('<div class="bookInfo"></div>');
+
 // get image url
 $.ajax({
     url: imageUrl,
@@ -92,10 +94,10 @@ $.ajax({
 for (first in data.query.pages) {
 firsty = first;
 }
-if(typeof alreadyDid == 'undefined'){
+
 setThis.find('.bookInfo').append('<img src="'+data.query.pages[firsty].thumbnail.source+'"/>');
 setThis.addClass('appendSet');
-} 
+
 
 console.log(data.query.pages[firsty].thumbnail.source);
 
@@ -117,23 +119,22 @@ firsty = first;
 for (allCats in data.query.pages[firsty].categories) {
 checkCats = allCats;
 console.log(data.query.pages[firsty].categories[checkCats].title);
-if(typeof alreadyDid == 'undefined'){
-  console.log(setThis.parent());
-setThis.find('.bookInfo').append('<p>"'+data.query.pages[firsty].categories[checkCats].title+'"</p>');
+catTitle = data.query.pages[firsty].categories[checkCats].title.replace('Category:', '');
+
+setThis.find('.bookInfo').append('<p>'+catTitle+'</p>');
 setThis.addClass('appendSet');
 
 }
 
-}
 
-setThis.find('.bookInfo').slideToggle();
 
 
 
 } );
-
-
-  
+}
+setTimeout(function(){
+setThis.find('.bookInfo').slideToggle();
+  }, 300);
   },
 
   render: function() {
