@@ -25,8 +25,16 @@
 
 </div>
 <script type="text/jsx">
- var BookTitle = [];
+
+$(document).ready(function(){
  
+  getBooks();
+
+
+function getBooks(){
+
+  var BookTitle = [];
+
   $.ajax({
     url: 'https://en.wikipedia.org/w/api.php?action=query&list=random&format=json&rnnamespace=108&rnlimit=10',
     data: {
@@ -36,16 +44,24 @@
 }).done( function ( data ) {
   for(var i = 0; i < data.query.random.length; i++){
    console.log(data.query.random[i]);
+
    var title = data.query.random[i].title.replace('Book:', '');
    var ID = data.query.random[i].id;
 
    BookTitle.push(title );
+
+   if(i == data.query.random.length - 1){
+    startReact(BookTitle);
+   }
   
 }
 
 } );
 
-setTimeout(function(){
+
+}
+
+function startReact(BookTitle){
 
 
 var Library = React.createClass({
@@ -113,10 +129,10 @@ React.render(
   <Library items={BookTitle} />, document.getElementById('main')
 );
 
-}, 3000);
+}
 
 
-
+});
 
 </script>
 </body>
