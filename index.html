@@ -13,11 +13,18 @@
 </head>
 
 <body>
-<div id="header">
 
-</div>
+<div id="wrapper">
 
-<div id="main">
+<div id="appHead">
+  <div class="tab listed active">
+  Pages
+  </div>
+  <div class="tab saved">
+    Bookmarks
+  </div>
+
+</div><div id="main">
 
 </div>
 <div id="bookMarks">
@@ -27,16 +34,35 @@
 <div id="footer">
 
 </div>
+</div>
 <script type="text/jsx">
 
 $(document).ready(function(){
  
   getBooks();
 
+getBookmarks();
+
+
+  function getBookmarks(){
+    if(localStorage.length > 0){
+
+      for (first in localStorage) {
+name = first;
+if(name != "booksArray"){
+  $('#bookMarks').append('<p>'+ localStorage[name] + '<input class="bookRemove" type="button" value="Remove">' + '</p>');
+
+}
+}
+
+
+    }
+  }
 
 function getBooks(){
-
-  var BookTitle = [];
+   var BookTitle = [];
+if(typeof localStorage.booksArray == 'undefined'){
+ 
 
   $.ajax({
     url: 'https://en.wikipedia.org/w/api.php?action=query&list=random&format=json&rnnamespace=108&rnlimit=10',
@@ -54,13 +80,19 @@ function getBooks(){
    BookTitle.push(title );
 
    if(i == data.query.random.length - 1){
+    localStorage.booksArray = JSON.stringify(BookTitle);
     startReact(BookTitle);
    }
   
 }
 
 } );
-
+}
+else{
+BookTitle = JSON.parse(localStorage.booksArray)
+console.log(BookTitle);
+startReact(BookTitle);
+}
 
 }
 
@@ -69,10 +101,8 @@ function startReact(BookTitle){
 
 var Library = React.createClass({
   handleClick: function(i) {
-    
-    
-
-    var getTitle =  this.props.items[i];
+        
+var getTitle =  this.props.items[i];
 console.log(getTitle);
 var infoUrl = 'https://en.wikipedia.org/w/api.php?action=query&prop=categories|pageimages|pageterms&format=json&rawcontinue=&titles=Book:' + getTitle;
 var imageUrl = 'https://en.wikipedia.org//w/api.php?action=query&titles=' +getTitle+ '&prop=pageimages';
@@ -83,8 +113,12 @@ var imageUrl = 'https://en.wikipedia.org//w/api.php?action=query&titles=' +getTi
  var alreadyDid = splitClass[1];
 if(typeof alreadyDid == 'undefined'){
 setThis.append('<div class="bookInfo"><div class="imageContainer"></div><div class="categoryContainer"><h3>Categories:</h3></div></div>');
+if(localStorage[getTitle] == getTitle){
+setThis.find('.categoryContainer').after('<input class="marker" type="button" value="Remove Bookmark">');
+}
+else{
 setThis.find('.categoryContainer').after('<input class="marker" type="button" value="Bookmark This">');
-
+}
 // get image url
 $.ajax({
     url: imageUrl,
@@ -159,6 +193,7 @@ React.render(
   <Library items={BookTitle} />, document.getElementById('main')
 );
 
+
 }
 
 $('.marker').live('click', function(){
@@ -171,7 +206,10 @@ $('#bookMarks').append('<p>'+ thisTitle + '<input class="bookRemove" type="butto
 }
 else{
   $(this).val('Bookmark This');
+  $('#bookMarks p:contains("'+localStorage[thisTitle]+'")').remove();
 localStorage.removeItem(thisTitle);
+
+
 }
 
 });
@@ -182,6 +220,20 @@ $('.books h2:contains("'+listTitle+'")').parent().find('.marker').val('Bookmark 
 console.log($('.books h2:contains("'+listTitle+'")').parent().find('.marker').val());
 $(this).parent().remove();
 });
+
+$('.listed, .saved').click(function(){
+  $('.tab').removeClass('active');
+$(this).addClass('active');
+});
+$('.listed').click(function(){
+  $('#bookMarks').fadeOut();
+$('#main').fadeIn();
+});
+$('.saved').click(function(){
+$('#bookMarks').fadeIn();
+$('#main').fadeOut();
+});
+
 
 });
 

@@ -1,7 +1,7 @@
-
+#wrapper{max-width: 400px; margin: 0 auto;}
+h2{margin: 0;}
 #main{
-	 
-max-width: 400px;
+	 clear: both;
 width: 100%;
 margin: 0 auto;
 text-align: center;
@@ -21,4 +21,10 @@ text-align: center;
 background-color: #eee;
 color:#000;
 }
+#bookMarks{display: none; clear: both; padding: 20px;}
+#bookMarks p{display: block;}
 .bookInfo{display: none; padding:20px; text-align: left;}
+.tab{padding:10px; font-size:16px; display: inline-block; min-width: 100px; text-align: center; cursor: pointer; border:2px solid #000; float:left;}
+.active{background-color: #333; color:#fff; font-weight: bold; }
+.listed{}
+.saved{}
