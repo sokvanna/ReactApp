@@ -50,7 +50,7 @@ getBookmarks();
       for (first in localStorage) {
 name = first;
 if(name != "booksArray"){
-  $('#bookMarks').append('<p>'+ localStorage[name] + '<input class="bookRemove" type="button" value="Remove">' + '</p>');
+  $('#bookMarks').append('<p><a href="#" class="bookLink">'+ localStorage[name] + '</a><input class="bookRemove" type="button" value="Remove">' + '</p>');
 
 }
 }
@@ -229,7 +229,7 @@ var thisTitle =$(this).parent().parent().find('h2').text();
 if(getVal == 'Bookmark This'){
 $(this).val('Remove Bookmark');
 localStorage[thisTitle] = thisTitle;
-$('#bookMarks').append('<p>'+ thisTitle + '<input class="bookRemove" type="button" value="Remove">' + '</p>');
+$('#bookMarks').append('<p><a href="#" class="bookLink">'+ thisTitle + '</a><input class="bookRemove" type="button" value="Remove">' + '</p>');
 }
 else{
   $(this).val('Bookmark This');
@@ -241,6 +241,15 @@ localStorage.removeItem(thisTitle);
 
 });
 
+$('.bookLink').live('click', function(e){
+  e.preventDefault();
+var theTitle = $(this).text();
+$('#bookMarks').fadeOut();
+$('#main').fadeIn();
+ $('.tab').removeClass('active');
+$('.listed').addClass('active');
+$('.books h2:contains("'+theTitle+'")').click();
+});
 $('.bookRemove').live('click', function(){
 var listTitle = $(this).parent().text();
 $('.books h2:contains("'+listTitle+'")').parent().find('.marker').val('Bookmark This');
