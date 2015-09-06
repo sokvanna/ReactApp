@@ -133,16 +133,16 @@ for (first in data.query.pages) {
 firsty = first;
 }
 console.log(data.query.pages[firsty]);
-if('thumbnail' in data.query.pages[firsty]){
-setThis.find('.imageContainer').append('<img src="'+data.query.pages[firsty].thumbnail.source+'"/>');
+if('pageimage' in data.query.pages[firsty]){
+//setThis.find('.imageContainer').append('<img src="'+data.query.pages[firsty].thumbnail.source+'"/>');
+mainImage = data.query.pages[firsty].pageimage;
+getSource(mainImage, setThis);
 }
 else{
  setThis.find('.imageContainer').append('<p>No images found</p>'); 
 }
 
 setThis.addClass('appendSet');
-
-
 
 } );
 
@@ -201,6 +201,28 @@ React.render(
 
 }
 
+function getSource(mainImage, setThis){
+  console.log(mainImage);
+  setUrl = 'https://en.wikipedia.org//w/api.php?action=query&titles=Image:'+mainImage+'&prop=imageinfo&iiprop=url'
+  $.ajax({
+    url: setUrl,
+    data: {
+        format: 'json'
+    },
+    dataType: 'jsonp'
+}).done( function ( data ) {
+  var firsty;
+
+for (first in data.query.pages) {
+firsty = first;
+}
+setThis.find('.imageContainer').append('<img src="'+data.query.pages[firsty].imageinfo[0].url+'"/>');
+
+
+
+
+} );
+}
 $('.marker').live('click', function(){
 var getVal = $(this).val();
 var thisTitle =$(this).parent().parent().find('h2').text();
