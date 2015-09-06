@@ -6,16 +6,19 @@
 	<meta charset="UTF-8">
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 	<link href="styles.css" media="all" type="text/css" rel="stylesheet">
   <script src="https://fb.me/react-0.13.3.min.js"></script>
   <script src="https://fb.me/JSXTransformer-0.13.3.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
 </head>
 
 <body>
 
 <div id="wrapper">
-
+<h1 class="pageTitle"><span>&#xf266;</span>ikipediA</h1>
 <div id="appHead">
   <div class="tab listed active">
   Pages
@@ -23,7 +26,9 @@
   <div class="tab saved">
     Bookmarks
   </div>
-
+<div class="tab reset">
+    Reset
+  </div>
 </div><div id="main">
 
 </div>
@@ -50,7 +55,7 @@ getBookmarks();
       for (first in localStorage) {
 name = first;
 if(name != "booksArray"){
-  $('#bookMarks').append('<p><a href="#" class="bookLink">'+ localStorage[name] + '</a><input class="bookRemove" type="button" value="Remove">' + '</p>');
+  $('#bookMarks').append('<p><a href="#" class="bookLink">'+ localStorage[name] + '</a><input class="btn bookRemove" type="button" value="Remove">' + '</p>');
 
 }
 }
@@ -114,10 +119,10 @@ var imageUrl = 'https://en.wikipedia.org//w/api.php?action=query&titles=' +getTi
 if(typeof alreadyDid == 'undefined'){
 setThis.append('<div class="bookInfo"><div class="imageContainer"></div><div class="categoryContainer"><h3>Categories:</h3></div></div>');
 if(localStorage[getTitle] == getTitle){
-setThis.find('.categoryContainer').after('<input class="marker" type="button" value="Remove Bookmark">');
+setThis.find('.categoryContainer').after('<input class="btn marker" type="button" value="Remove Bookmark">');
 }
 else{
-setThis.find('.categoryContainer').after('<input class="marker" type="button" value="Bookmark This">');
+setThis.find('.categoryContainer').after('<input class="btn marker" type="button" value="Bookmark This">');
 }
 // get image url
 $.ajax({
@@ -229,7 +234,7 @@ var thisTitle =$(this).parent().parent().find('h2').text();
 if(getVal == 'Bookmark This'){
 $(this).val('Remove Bookmark');
 localStorage[thisTitle] = thisTitle;
-$('#bookMarks').append('<p><a href="#" class="bookLink">'+ thisTitle + '</a><input class="bookRemove" type="button" value="Remove">' + '</p>');
+$('#bookMarks').append('<p><a href="#" class="bookLink">'+ thisTitle + '</a><input class="btn bookRemove" type="button" value="Remove">' + '</p>');
 }
 else{
   $(this).val('Bookmark This');
@@ -263,15 +268,24 @@ $('.listed, .saved').click(function(){
 $(this).addClass('active');
 });
 $('.listed').click(function(){
-  $('#bookMarks').fadeOut();
+  $('#bookMarks').hide();
 $('#main').fadeIn();
 });
 $('.saved').click(function(){
 $('#bookMarks').fadeIn();
-$('#main').fadeOut();
+$('#main').hide();
 });
 
+$('.reset').click(function(){
+    var x;
+    if (confirm("You are about to clear all saved data and populate new pages. Press OK to continue.") == true) {
+       localStorage.clear();
+        window.location.reload();
+    } else {
+        x = "You pressed Cancel!";
+    }
 
+});
 });
 
 </script>
