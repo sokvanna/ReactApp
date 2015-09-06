@@ -128,16 +128,21 @@ $.ajax({
     dataType: 'jsonp'
 }).done( function ( data ) {
   var firsty;
-  
+
 for (first in data.query.pages) {
 firsty = first;
 }
-
+console.log(data.query.pages[firsty]);
+if('thumbnail' in data.query.pages[firsty]){
 setThis.find('.imageContainer').append('<img src="'+data.query.pages[firsty].thumbnail.source+'"/>');
+}
+else{
+ setThis.find('.imageContainer').append('<p>No images found</p>'); 
+}
+
 setThis.addClass('appendSet');
 
 
-console.log(data.query.pages[firsty].thumbnail.source);
 
 } );
 
