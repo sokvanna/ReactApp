@@ -219,6 +219,7 @@ var listTitle = $(this).parent().text();
 $('.books h2:contains("'+listTitle+'")').parent().find('.marker').val('Bookmark This');
 console.log($('.books h2:contains("'+listTitle+'")').parent().find('.marker').val());
 $(this).parent().remove();
+localStorage.removeItem(listTitle);
 });
 
 $('.listed, .saved').click(function(){
