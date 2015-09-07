@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<title>SamePage</title>
+	<title>Bookmarking App</title>
 	<meta charset="UTF-8">
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -20,24 +20,16 @@
 <div id="wrapper">
 <h1 class="pageTitle"><span>&#xf266;</span>ikipediA</h1>
 <div id="appHead">
-  <div class="tab listed active">
-  Pages
-  </div>
-  <div class="tab saved">
-    Bookmarks
-  </div>
-<div class="tab reset">
-    Reset
-  </div>
-</div><div id="main">
-
+<div class="tab listed active">Pages</div>
+<div class="tab saved">Bookmarks</div>
+<div class="tab reset">Reset</div>
+</div>
+<div id="main">
 </div>
 <div id="bookMarks">
-
-  </div>
+</div>
 
 <div id="footer">
-
 </div>
 </div>
 <script type="text/babel">
@@ -45,12 +37,12 @@
 $(document).ready(function() {
     var first;
     var allCats;
-
+    //grab page titles
     getBooks();
-
+    //check for bookmarks already saved
     getBookmarks();
 
-
+    // grab already saved local storage bookmarks and add them
     function getBookmarks() {
         if (localStorage.length > 0) {
 
@@ -67,9 +59,10 @@ $(document).ready(function() {
     }
 
     function getBooks() {
+        // array of titles
         var BookTitle = [];
+        // if there is not already a saved array of book titles then query the api for random titles and push to array
         if (typeof localStorage.booksArray == 'undefined') {
-
 
             $.ajax({
                 url: 'https://en.wikipedia.org/w/api.php?action=query&list=random&format=json&rnnamespace=108&rnlimit=10',
@@ -79,8 +72,7 @@ $(document).ready(function() {
                 dataType: 'jsonp'
             }).done(function(data) {
                 for (var i = 0; i < data.query.random.length; i++) {
-                    console.log(data.query.random[i]);
-
+                
                     var title = data.query.random[i].title.replace('Book:', '');
                     var ID = data.query.random[i].id;
 
@@ -95,33 +87,42 @@ $(document).ready(function() {
 
             });
         } else {
+            // there is data in localstorage so use it
             BookTitle = JSON.parse(localStorage.booksArray)
-            console.log(BookTitle);
+          
             startReact(BookTitle);
         }
 
     }
 
+    // start react 
     function startReact(BookTitle) {
 
-
+        // component to render
         var Library = React.createClass({
+            // onClick query page title then query api to grab all categories and main image then append to dom.
             handleClick: function(i) {
 
                 var getTitle = this.props.items[i];
-                console.log(getTitle);
+                // path to get all categories
                 var infoUrl = 'https://en.wikipedia.org/w/api.php?action=query&prop=categories|pageimages|pageterms&format=json&rawcontinue=&titles=Book:' + getTitle;
+                // path to get main image
                 var imageUrl = 'https://en.wikipedia.org//w/api.php?action=query&titles=' + getTitle + '&prop=pageimages';
-                // get category and description if available
+                // set the element where we are at in the dom
                 var setThis = $(this.getDOMNode()).find('div:contains(' + getTitle + ')');
-                console.log(setThis);
+               // split to see what classes are already on this element
                 var splitClass = setThis.attr('class').split(' ');
                 var alreadyDid = splitClass[1];
+                // if there is none then append the default divs to the element to hold the info
                 if (typeof alreadyDid == 'undefined') {
                     setThis.append('<div class="bookInfo"><div class="imageContainer"></div><div class="categoryContainer"><h3>Categories:</h3></div></div>');
+                    // if there is already a saved bookmark then add this button with Remove cause it is already bookmarked
                     if (localStorage[getTitle] == getTitle) {
                         setThis.find('.categoryContainer').after('<input class="btn marker" type="button" value="Remove Bookmark">');
-                    } else {
+                    } 
+
+                    // if there not a already save bookmark in localstorage add default button bookmark
+                    else {
                         setThis.find('.categoryContainer').after('<input class="btn marker" type="button" value="Bookmark This">');
                     }
                     // get image url
@@ -133,23 +134,23 @@ $(document).ready(function() {
                         dataType: 'jsonp'
                     }).done(function(data) {
                         var firsty;
-
                         for (first in data.query.pages) {
                             firsty = first;
                         }
-                        console.log(data.query.pages[firsty]);
+                       // if there is a source then get the final source and append to dom element
                         if ('pageimage' in data.query.pages[firsty]) {
-                            //setThis.find('.imageContainer').append('<img src="'+data.query.pages[firsty].thumbnail.source+'"/>');
+                           
                             var mainImage = data.query.pages[firsty].pageimage;
                             getSource(mainImage, setThis);
                         } else {
                             setThis.find('.imageContainer').append('<p>No images found</p>');
                         }
 
+                        // addClass to this element so that we can check and know to not run the query again
                         setThis.addClass('appendSet');
 
                     });
-
+                    // Ajax api to get all categories
                     $.ajax({
                         url: infoUrl,
                         data: {
@@ -165,7 +166,7 @@ $(document).ready(function() {
                         }
                         for (allCats in data.query.pages[firsty].categories) {
                             var checkCats = allCats;
-                            console.log(data.query.pages[firsty].categories[checkCats].title);
+                        
                             var catTitle = data.query.pages[firsty].categories[checkCats].title.replace('Category:', '');
 
                             setThis.find('.categoryContainer').append('<p>' + catTitle + '</p>');
@@ -183,7 +184,7 @@ $(document).ready(function() {
                 setThis.find('.bookInfo').slideToggle('slow');
 
             },
-
+            // render through all page data from array
             render: function() {
                 return ( < div > {
                     this.props.items.map(function(item, i) {
@@ -200,8 +201,9 @@ $(document).ready(function() {
 
     }
 
+    // grab the image url path and append to dom element
     function getSource(mainImage, setThis) {
-        console.log(mainImage);
+   
         var setUrl = 'https://en.wikipedia.org//w/api.php?action=query&titles=Image:' + mainImage + '&prop=imageinfo&iiprop=url'
         $.ajax({
             url: setUrl,
@@ -222,6 +224,7 @@ $(document).ready(function() {
 
         });
     }
+    // whenever a Bookmark this button is clicked, store that title and append to other div for list of Bookmarks
     $('.marker').live('click', function() {
         var getVal = $(this).val();
         var thisTitle = $(this).parent().parent().find('h2').text().trim();
@@ -238,7 +241,7 @@ $(document).ready(function() {
         }
 
     });
-
+    // whenever a Bookmark link is clicked go to main div and show that page title info
     $('.bookLink').live('click', function(e) {
         e.preventDefault();
         var theTitle = $(this).text();
@@ -248,27 +251,29 @@ $(document).ready(function() {
         $('.listed').addClass('active');
         $('.books h2:contains("' + theTitle + '")').click();
     });
+    // whenever I click remove on the Bookmarks tab, remove this from list and remove it from localstorage
     $('.bookRemove').live('click', function() {
         var listTitle = $(this).parent().text();
-        $('.books h2:contains("' + listTitle + '")').parent().find('.marker').val('Bookmark This');
-        console.log($('.books h2:contains("' + listTitle + '")').parent().find('.marker').val());
+        $('.books h2:contains("' + listTitle + '")').parent().find('.marker').val('Bookmark This');      
         $(this).parent().remove();
         localStorage.removeItem(listTitle);
     });
-
+    // add active class when toggling between tab buttons
     $('.listed, .saved').click(function() {
         $('.tab').removeClass('active');
         $(this).addClass('active');
     });
+    // for detail view of all pages when this tab is clicked
     $('.listed').click(function() {
         $('#bookMarks').hide();
         $('#main').fadeIn();
     });
+    // show bookmark list when this tab is clicked
     $('.saved').click(function() {
         $('#bookMarks').fadeIn();
         $('#main').hide();
     });
-
+    // when reset button is clicked clear all localstorage and refresh the page
     $('.reset').click(function() {
         var x;
         if (confirm("You are about to clear all saved data and populate new pages. Press OK to continue.") == true) {
