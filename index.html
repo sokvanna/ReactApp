@@ -42,252 +42,254 @@
 </div>
 <script type="text/babel">
 
-$(document).ready(function(){
- var first;
- var allCats;
- 
-  getBooks();
+$(document).ready(function() {
+    var first;
+    var allCats;
 
-getBookmarks();
+    getBooks();
+
+    getBookmarks();
 
 
-  function getBookmarks(){
-    if(localStorage.length > 0){
+    function getBookmarks() {
+        if (localStorage.length > 0) {
 
-      for (first in localStorage) {
-name = first;
-if(name != "booksArray"){
-  $('#bookMarks').append('<p><a href="#" class="bookLink">'+ localStorage[name] + '</a><input class="btn bookRemove" type="button" value="Remove">' + '</p>');
+            for (first in localStorage) {
+                name = first;
+                if (name != "booksArray") {
+                    $('#bookMarks').append('<p><a href="#" class="bookLink">' + localStorage[name] + '</a><input class="btn bookRemove" type="button" value="Remove">' + '</p>');
 
-}
-}
+                }
+            }
+
+
+        }
+    }
+
+    function getBooks() {
+        var BookTitle = [];
+        if (typeof localStorage.booksArray == 'undefined') {
+
+
+            $.ajax({
+                url: 'https://en.wikipedia.org/w/api.php?action=query&list=random&format=json&rnnamespace=108&rnlimit=10',
+                data: {
+                    format: 'json'
+                },
+                dataType: 'jsonp'
+            }).done(function(data) {
+                for (var i = 0; i < data.query.random.length; i++) {
+                    console.log(data.query.random[i]);
+
+                    var title = data.query.random[i].title.replace('Book:', '');
+                    var ID = data.query.random[i].id;
+
+                    BookTitle.push(title);
+
+                    if (i == data.query.random.length - 1) {
+                        localStorage.booksArray = JSON.stringify(BookTitle);
+                        startReact(BookTitle);
+                    }
+
+                }
+
+            });
+        } else {
+            BookTitle = JSON.parse(localStorage.booksArray)
+            console.log(BookTitle);
+            startReact(BookTitle);
+        }
+
+    }
+
+    function startReact(BookTitle) {
+
+
+        var Library = React.createClass({
+            handleClick: function(i) {
+
+                var getTitle = this.props.items[i];
+                console.log(getTitle);
+                var infoUrl = 'https://en.wikipedia.org/w/api.php?action=query&prop=categories|pageimages|pageterms&format=json&rawcontinue=&titles=Book:' + getTitle;
+                var imageUrl = 'https://en.wikipedia.org//w/api.php?action=query&titles=' + getTitle + '&prop=pageimages';
+                // get category and description if available
+                var setThis = $(this.getDOMNode()).find('div:contains(' + getTitle + ')');
+                console.log(setThis);
+                var splitClass = setThis.attr('class').split(' ');
+                var alreadyDid = splitClass[1];
+                if (typeof alreadyDid == 'undefined') {
+                    setThis.append('<div class="bookInfo"><div class="imageContainer"></div><div class="categoryContainer"><h3>Categories:</h3></div></div>');
+                    if (localStorage[getTitle] == getTitle) {
+                        setThis.find('.categoryContainer').after('<input class="btn marker" type="button" value="Remove Bookmark">');
+                    } else {
+                        setThis.find('.categoryContainer').after('<input class="btn marker" type="button" value="Bookmark This">');
+                    }
+                    // get image url
+                    $.ajax({
+                        url: imageUrl,
+                        data: {
+                            format: 'json'
+                        },
+                        dataType: 'jsonp'
+                    }).done(function(data) {
+                        var firsty;
+
+                        for (first in data.query.pages) {
+                            firsty = first;
+                        }
+                        console.log(data.query.pages[firsty]);
+                        if ('pageimage' in data.query.pages[firsty]) {
+                            //setThis.find('.imageContainer').append('<img src="'+data.query.pages[firsty].thumbnail.source+'"/>');
+                            var mainImage = data.query.pages[firsty].pageimage;
+                            getSource(mainImage, setThis);
+                        } else {
+                            setThis.find('.imageContainer').append('<p>No images found</p>');
+                        }
+
+                        setThis.addClass('appendSet');
+
+                    });
+
+                    $.ajax({
+                        url: infoUrl,
+                        data: {
+                            format: 'json'
+                        },
+                        dataType: 'jsonp'
+                    }).done(function(data) {
+
+                        var firsty;
+
+                        for (first in data.query.pages) {
+                            firsty = first;
+                        }
+                        for (allCats in data.query.pages[firsty].categories) {
+                            var checkCats = allCats;
+                            console.log(data.query.pages[firsty].categories[checkCats].title);
+                            var catTitle = data.query.pages[firsty].categories[checkCats].title.replace('Category:', '');
+
+                            setThis.find('.categoryContainer').append('<p>' + catTitle + '</p>');
+                            setThis.addClass('appendSet');
+
+                        }
+
+
+
+
+                    });
+
+                }
+
+                setThis.find('.bookInfo').slideToggle('slow');
+
+            },
+
+            render: function() {
+                return ( < div > {
+                    this.props.items.map(function(item, i) {
+                        return ( < div className = "books"
+                            onClick = {
+                                this.handleClick.bind(this, i)
+                            }
+                            key = {
+                                i
+                            } > < h2 > {
+                                item
+                            } < /h2></div >
+                        );
+                    }, this)
+                } < /div>);
+            }
+        });
+
+        React.render( < Library items = {
+                BookTitle
+            }
+            />, document.getElementById('main')
+        );
 
 
     }
-  }
 
-function getBooks(){
-   var BookTitle = [];
-if(typeof localStorage.booksArray == 'undefined'){
- 
+    function getSource(mainImage, setThis) {
+        console.log(mainImage);
+        var setUrl = 'https://en.wikipedia.org//w/api.php?action=query&titles=Image:' + mainImage + '&prop=imageinfo&iiprop=url'
+        $.ajax({
+            url: setUrl,
+            data: {
+                format: 'json'
+            },
+            dataType: 'jsonp'
+        }).done(function(data) {
+            var firsty;
 
-  $.ajax({
-    url: 'https://en.wikipedia.org/w/api.php?action=query&list=random&format=json&rnnamespace=108&rnlimit=10',
-    data: {
-        format: 'json'
-    },
-    dataType: 'jsonp'
-}).done( function ( data ) {
-  for(var i = 0; i < data.query.random.length; i++){
-   console.log(data.query.random[i]);
-
-   var title = data.query.random[i].title.replace('Book:', '');
-   var ID = data.query.random[i].id;
-
-   BookTitle.push(title );
-
-   if(i == data.query.random.length - 1){
-    localStorage.booksArray = JSON.stringify(BookTitle);
-    startReact(BookTitle);
-   }
-  
-}
-
-} );
-}
-else{
-BookTitle = JSON.parse(localStorage.booksArray)
-console.log(BookTitle);
-startReact(BookTitle);
-}
-
-}
-
-function startReact(BookTitle){
-
-
-var Library = React.createClass({
-  handleClick: function(i) {
-        
-var getTitle =  this.props.items[i];
-console.log(getTitle);
-var infoUrl = 'https://en.wikipedia.org/w/api.php?action=query&prop=categories|pageimages|pageterms&format=json&rawcontinue=&titles=Book:' + getTitle;
-var imageUrl = 'https://en.wikipedia.org//w/api.php?action=query&titles=' +getTitle+ '&prop=pageimages';
-// get category and description if available
- var setThis = $(this.getDOMNode()).find('div:contains(' + getTitle + ')');
-    console.log(setThis);
- var splitClass = setThis.attr('class').split(' ');
- var alreadyDid = splitClass[1];
-if(typeof alreadyDid == 'undefined'){
-setThis.append('<div class="bookInfo"><div class="imageContainer"></div><div class="categoryContainer"><h3>Categories:</h3></div></div>');
-if(localStorage[getTitle] == getTitle){
-setThis.find('.categoryContainer').after('<input class="btn marker" type="button" value="Remove Bookmark">');
-}
-else{
-setThis.find('.categoryContainer').after('<input class="btn marker" type="button" value="Bookmark This">');
-}
-// get image url
-$.ajax({
-    url: imageUrl,
-    data: {
-        format: 'json'
-    },
-    dataType: 'jsonp'
-}).done( function ( data ) {
-  var firsty;
-
-for (first in data.query.pages) {
-firsty = first;
-}
-console.log(data.query.pages[firsty]);
-if('pageimage' in data.query.pages[firsty]){
-//setThis.find('.imageContainer').append('<img src="'+data.query.pages[firsty].thumbnail.source+'"/>');
-var mainImage = data.query.pages[firsty].pageimage;
-getSource(mainImage, setThis);
-}
-else{
- setThis.find('.imageContainer').append('<p>No images found</p>'); 
-}
-
-setThis.addClass('appendSet');
-
-} );
-
-$.ajax({
-    url: infoUrl,
-    data: {
-        format: 'json'
-    },
-    dataType: 'jsonp'
-}).done( function (data) {
-
-    var firsty;
-  
-for (first in data.query.pages) {
-firsty = first;
-}
-for (allCats in data.query.pages[firsty].categories) {
-var checkCats = allCats;
-console.log(data.query.pages[firsty].categories[checkCats].title);
-var catTitle = data.query.pages[firsty].categories[checkCats].title.replace('Category:', '');
-
-setThis.find('.categoryContainer').append('<p>'+catTitle+'</p>');
-setThis.addClass('appendSet');
-
-}
+            for (first in data.query.pages) {
+                firsty = first;
+            }
+            setThis.find('.imageContainer').append('<img src="' + data.query.pages[firsty].imageinfo[0].url + '"/>');
 
 
 
 
-
-} );
-
-}
-
-setThis.find('.bookInfo').slideToggle('slow');
-  
-  },
-
-  render: function() {
-    return (
-      <div>
-        {this.props.items.map(function(item, i) {
-          return (
-            <div className="books" onClick={this.handleClick.bind(this, i)} key={i}><h2>{item}</h2></div>
-          );
-        }, this)}
-      </div>
-    );
-  }
-});
-
-React.render(
-  <Library items={BookTitle} />, document.getElementById('main')
-);
-
-
-}
-
-function getSource(mainImage, setThis){
-  console.log(mainImage);
-  var setUrl = 'https://en.wikipedia.org//w/api.php?action=query&titles=Image:'+mainImage+'&prop=imageinfo&iiprop=url'
-  $.ajax({
-    url: setUrl,
-    data: {
-        format: 'json'
-    },
-    dataType: 'jsonp'
-}).done( function ( data ) {
-  var firsty;
-
-for (first in data.query.pages) {
-firsty = first;
-}
-setThis.find('.imageContainer').append('<img src="'+data.query.pages[firsty].imageinfo[0].url+'"/>');
-
-
-
-
-} );
-}
-$('.marker').live('click', function(){
-var getVal = $(this).val();
-var thisTitle =$(this).parent().parent().find('h2').text();
-if(getVal == 'Bookmark This'){
-$(this).val('Remove Bookmark');
-localStorage[thisTitle] = thisTitle;
-$('#bookMarks').append('<p><a href="#" class="bookLink">'+ thisTitle + '</a><input class="btn bookRemove" type="button" value="Remove">' + '</p>');
-}
-else{
-  $(this).val('Bookmark This');
-  $('#bookMarks p:contains("'+localStorage[thisTitle]+'")').remove();
-localStorage.removeItem(thisTitle);
-
-
-}
-
-});
-
-$('.bookLink').live('click', function(e){
-  e.preventDefault();
-var theTitle = $(this).text();
-$('#bookMarks').fadeOut();
-$('#main').fadeIn();
- $('.tab').removeClass('active');
-$('.listed').addClass('active');
-$('.books h2:contains("'+theTitle+'")').click();
-});
-$('.bookRemove').live('click', function(){
-var listTitle = $(this).parent().text();
-$('.books h2:contains("'+listTitle+'")').parent().find('.marker').val('Bookmark This');
-console.log($('.books h2:contains("'+listTitle+'")').parent().find('.marker').val());
-$(this).parent().remove();
-localStorage.removeItem(listTitle);
-});
-
-$('.listed, .saved').click(function(){
-  $('.tab').removeClass('active');
-$(this).addClass('active');
-});
-$('.listed').click(function(){
-  $('#bookMarks').hide();
-$('#main').fadeIn();
-});
-$('.saved').click(function(){
-$('#bookMarks').fadeIn();
-$('#main').hide();
-});
-
-$('.reset').click(function(){
-    var x;
-    if (confirm("You are about to clear all saved data and populate new pages. Press OK to continue.") == true) {
-       localStorage.clear();
-        window.location.reload();
-    } else {
-        x = "You pressed Cancel!";
+        });
     }
+    $('.marker').live('click', function() {
+        var getVal = $(this).val();
+        var thisTitle = $(this).parent().parent().find('h2').text();
+        if (getVal == 'Bookmark This') {
+            $(this).val('Remove Bookmark');
+            localStorage[thisTitle] = thisTitle;
+            $('#bookMarks').append('<p><a href="#" class="bookLink">' + thisTitle + '</a><input class="btn bookRemove" type="button" value="Remove">' + '</p>');
+        } else {
+            $(this).val('Bookmark This');
+            $('#bookMarks p:contains("' + localStorage[thisTitle] + '")').remove();
+            localStorage.removeItem(thisTitle);
 
-});
+
+        }
+
+    });
+
+    $('.bookLink').live('click', function(e) {
+        e.preventDefault();
+        var theTitle = $(this).text();
+        $('#bookMarks').fadeOut();
+        $('#main').fadeIn();
+        $('.tab').removeClass('active');
+        $('.listed').addClass('active');
+        $('.books h2:contains("' + theTitle + '")').click();
+    });
+    $('.bookRemove').live('click', function() {
+        var listTitle = $(this).parent().text();
+        $('.books h2:contains("' + listTitle + '")').parent().find('.marker').val('Bookmark This');
+        console.log($('.books h2:contains("' + listTitle + '")').parent().find('.marker').val());
+        $(this).parent().remove();
+        localStorage.removeItem(listTitle);
+    });
+
+    $('.listed, .saved').click(function() {
+        $('.tab').removeClass('active');
+        $(this).addClass('active');
+    });
+    $('.listed').click(function() {
+        $('#bookMarks').hide();
+        $('#main').fadeIn();
+    });
+    $('.saved').click(function() {
+        $('#bookMarks').fadeIn();
+        $('#main').hide();
+    });
+
+    $('.reset').click(function() {
+        var x;
+        if (confirm("You are about to clear all saved data and populate new pages. Press OK to continue.") == true) {
+            localStorage.clear();
+            window.location.reload();
+        } else {
+            x = "You pressed Cancel!";
+        }
+
+    });
 });
 
 </script>
