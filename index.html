@@ -6,12 +6,12 @@
 	<meta charset="UTF-8">
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
-	<link href="styles.css" media="all" type="text/css" rel="stylesheet">
   <script src="https://fb.me/react-0.13.3.min.js"></script>
 <script src="js/browser.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+  <link href="styles.css" media="all" type="text/css" rel="stylesheet">
 
 </head>
 
@@ -187,25 +187,14 @@ $(document).ready(function() {
             render: function() {
                 return ( < div > {
                     this.props.items.map(function(item, i) {
-                        return ( < div className = "books"
-                            onClick = {
-                                this.handleClick.bind(this, i)
-                            }
-                            key = {
-                                i
-                            } > < h2 > {
-                                item
-                            } < /h2></div >
+                        return ( <div className = "books" onClick = {this.handleClick.bind(this, i)} key = {i}> <h2> {item} </h2></div >
                         );
                     }, this)
                 } < /div>);
             }
         });
 
-        React.render( < Library items = {
-                BookTitle
-            }
-            />, document.getElementById('main')
+        React.render( <Library items = {BookTitle}/>, document.getElementById('main')
         );
 
 
@@ -235,7 +224,7 @@ $(document).ready(function() {
     }
     $('.marker').live('click', function() {
         var getVal = $(this).val();
-        var thisTitle = $(this).parent().parent().find('h2').text();
+        var thisTitle = $(this).parent().parent().find('h2').text().trim();
         if (getVal == 'Bookmark This') {
             $(this).val('Remove Bookmark');
             localStorage[thisTitle] = thisTitle;
