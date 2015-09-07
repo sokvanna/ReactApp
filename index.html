@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 	<link href="styles.css" media="all" type="text/css" rel="stylesheet">
   <script src="https://fb.me/react-0.13.3.min.js"></script>
-  <script src="https://fb.me/JSXTransformer-0.13.3.js"></script>
+<script src="js/browser.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 
 </head>
@@ -40,9 +40,11 @@
 
 </div>
 </div>
-<script type="text/jsx">
+<script type="text/babel">
 
 $(document).ready(function(){
+ var first;
+ var allCats;
  
   getBooks();
 
@@ -140,7 +142,7 @@ firsty = first;
 console.log(data.query.pages[firsty]);
 if('pageimage' in data.query.pages[firsty]){
 //setThis.find('.imageContainer').append('<img src="'+data.query.pages[firsty].thumbnail.source+'"/>');
-mainImage = data.query.pages[firsty].pageimage;
+var mainImage = data.query.pages[firsty].pageimage;
 getSource(mainImage, setThis);
 }
 else{
@@ -165,9 +167,9 @@ for (first in data.query.pages) {
 firsty = first;
 }
 for (allCats in data.query.pages[firsty].categories) {
-checkCats = allCats;
+var checkCats = allCats;
 console.log(data.query.pages[firsty].categories[checkCats].title);
-catTitle = data.query.pages[firsty].categories[checkCats].title.replace('Category:', '');
+var catTitle = data.query.pages[firsty].categories[checkCats].title.replace('Category:', '');
 
 setThis.find('.categoryContainer').append('<p>'+catTitle+'</p>');
 setThis.addClass('appendSet');
@@ -208,7 +210,7 @@ React.render(
 
 function getSource(mainImage, setThis){
   console.log(mainImage);
-  setUrl = 'https://en.wikipedia.org//w/api.php?action=query&titles=Image:'+mainImage+'&prop=imageinfo&iiprop=url'
+  var setUrl = 'https://en.wikipedia.org//w/api.php?action=query&titles=Image:'+mainImage+'&prop=imageinfo&iiprop=url'
   $.ajax({
     url: setUrl,
     data: {
