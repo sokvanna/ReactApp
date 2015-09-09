@@ -66,7 +66,7 @@ $(document).ready(function() {
         var BookTitle = [];
         // if there is not already a saved array of book titles then query the api for random titles and push to array
         if (typeof localStorage.booksArray == 'undefined') {
-
+    // Please note that for this app I am querying random book titles cause there is a better chance to recieve image src    
             $.ajax({
                 url: 'https://en.wikipedia.org/w/api.php?action=query&list=random&format=json&rnnamespace=108&rnlimit=10',
                 data: {
@@ -116,7 +116,7 @@ $(document).ready(function() {
                // split to see what classes are already on this element
                 var splitClass = setThis.attr('class').split(' ');
                 var alreadyDid = splitClass[1];
-                // if there is none then append the default divs to the element to hold the info
+                // if there is no second class then append the default divs to the element to hold the info
                 if (typeof alreadyDid == 'undefined') {
                 getData(getTitle, infoUrl, imageUrl, setThis);
                 }
@@ -291,13 +291,15 @@ $(document).ready(function() {
         }
 
     });
+    // listen for search button click
    $('.search').click(function(){
     var searchText = prompt("Please enter a page title", "Game of Thrones");
     if (searchText != null) {
+    // if there is a title, add before the first book/page    
     $('.books').first().before('<div class="books addon"><h2>'+searchText+'</h2></div>');
     }
     });
-
+    // listen for click on newly searched titles 
     $('.addon').live('click',function(){
     var splitClass = $(this).attr('class').split(' ');
     var alreadyDid = splitClass[2];
@@ -310,6 +312,7 @@ $(document).ready(function() {
     // set the element where we are at in the dom
     var setThis = $(this);
     if (typeof alreadyDid == 'undefined') {
+    //grab the image and categories    
     getData(getTitle, infoUrl, imageUrl, setThis);               }
     setThis.find('.bookInfo').slideToggle('slow');
  });
