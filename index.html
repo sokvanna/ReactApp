@@ -23,11 +23,14 @@
 <div class="tab listed active">Pages</div>
 <div class="tab saved">Bookmarks</div>
 <div class="tab reset">Reset</div>
+<div class="tab search">&#xf002;</div>
+
 </div>
 <div id="main">
 </div>
 <div id="bookMarks">
 </div>
+
 
 <div id="footer">
 </div>
@@ -115,7 +118,30 @@ $(document).ready(function() {
                 var alreadyDid = splitClass[1];
                 // if there is none then append the default divs to the element to hold the info
                 if (typeof alreadyDid == 'undefined') {
-                    setThis.append('<div class="bookInfo"><div class="imageContainer"></div><div class="categoryContainer"><h3>Categories:</h3></div></div>');
+                getData(getTitle, infoUrl, imageUrl, setThis);
+                }
+                setThis.find('.bookInfo').slideToggle('slow');
+
+            },
+            // render through all page data from array
+            render: function() {
+                return ( < div > {
+                    this.props.items.map(function(item, i) {
+                        return ( <div className = "books" onClick = {this.handleClick.bind(this, i)} key = {i}> <h2> {item} </h2></div >
+                        );
+                    }, this)
+                } < /div>);
+            }
+        });
+
+        React.render( <Library items = {BookTitle}/>, document.getElementById('main')
+        );
+
+
+    }
+
+    function getData(getTitle, infoUrl, imageUrl, setThis, alreadyDid){
+                   setThis.append('<div class="bookInfo"><div class="imageContainer"></div><div class="categoryContainer"><h3>Categories:</h3></div></div>');
                     // if there is already a saved bookmark then add this button with Remove cause it is already bookmarked
                     if (localStorage[getTitle] == getTitle) {
                         setThis.find('.categoryContainer').after('<input class="btn marker" type="button" value="Remove Bookmark">');
@@ -179,26 +205,7 @@ $(document).ready(function() {
 
                     });
 
-                }
-
-                setThis.find('.bookInfo').slideToggle('slow');
-
-            },
-            // render through all page data from array
-            render: function() {
-                return ( < div > {
-                    this.props.items.map(function(item, i) {
-                        return ( <div className = "books" onClick = {this.handleClick.bind(this, i)} key = {i}> <h2> {item} </h2></div >
-                        );
-                    }, this)
-                } < /div>);
-            }
-        });
-
-        React.render( <Library items = {BookTitle}/>, document.getElementById('main')
-        );
-
-
+                
     }
 
     // grab the image url path and append to dom element
@@ -284,6 +291,29 @@ $(document).ready(function() {
         }
 
     });
+   $('.search').click(function(){
+    var searchText = prompt("Please enter a page title", "Game of Thrones");
+    if (searchText != null) {
+    $('.books').first().before('<div class="books addon"><h2>'+searchText+'</h2></div>');
+    }
+    });
+
+    $('.addon').live('click',function(){
+    var splitClass = $(this).attr('class').split(' ');
+    var alreadyDid = splitClass[2];
+    // if there is none then append the default divs to the element to hold the info
+    var getTitle = $(this).text().trim();
+    // path to get all categori)es
+    var infoUrl = 'https://en.wikipedia.org/w/api.php?action=query&prop=categories|pageimages|pageterms&format=json&rawcontinue=&titles=Book:' + getTitle;
+    // path to get main image
+    var imageUrl = 'https://en.wikipedia.org//w/api.php?action=query&titles=' + getTitle + '&prop=pageimages';
+    // set the element where we are at in the dom
+    var setThis = $(this);
+    if (typeof alreadyDid == 'undefined') {
+    getData(getTitle, infoUrl, imageUrl, setThis);               }
+    setThis.find('.bookInfo').slideToggle('slow');
+ });
+
 });
 
 </script>

@@ -238,7 +238,7 @@ p {
 .imageContainer img {
     width: 100%;
 }
-.reset {
+.reset, .search {
     float: right;
     min-width: 25px;
     width: 25px;
@@ -249,4 +249,10 @@ p {
     padding: 5px;
     font-size: 9px;
     line-height: 3em;
+}
+.search{
+    margin-right: 10px;
+font-family: 'FontAwesome';
+font-size: 18px;
+line-height: 1.4em;
 }
